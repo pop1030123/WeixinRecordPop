@@ -13,13 +13,24 @@
         android:divider="#0000"
         android:listSelector="#0000"></ListView>
 
-    <com.gaoyuan.weixinrecord.manager.AudioRecordButton
+    <com.pop.weixinrecord.manager.AudioRecordButton
         android:id="@+id/em_tv_btn"
         android:layout_width="match_parent"
         android:layout_height="45dp"
         android:background="#cdcdcd"
         android:gravity="center"
         android:text="@string/long_click_record"
+        android:textColor="#fff"
+        android:textSize="16dp"/>
+
+    <com.pop.weixinrecord.manager.AudioRecordButton2
+        android:id="@+id/voice_record_btn"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:background="#cdcdcd"
+        android:gravity="center"
+        android:layout_marginTop="10dp"
+        android:text="点击录音"
         android:textColor="#fff"
         android:textSize="16dp"/>
 </LinearLayout>

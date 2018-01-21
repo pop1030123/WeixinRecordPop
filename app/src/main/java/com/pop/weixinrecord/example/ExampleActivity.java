@@ -12,15 +12,17 @@ import android.widget.Toast;
 import com.pop.weixinrecord.R;
 import com.pop.weixinrecord.history.DBManager;
 import com.pop.weixinrecord.manager.AudioRecordButton;
+import com.pop.weixinrecord.manager.AudioRecordButton2;
 import com.pop.weixinrecord.manager.MediaManager;
 import com.pop.weixinrecord.utils.PermissionHelper;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ExampleActivity extends AppCompatActivity {
+public class ExampleActivity extends AppCompatActivity implements View.OnClickListener {
     private ListView mEmLvRecodeList;
     private AudioRecordButton mEmTvBtn;
+    private AudioRecordButton2 mRecordBtn;
     List<Record> mRecords;
     ExampleAdapter mExampleAdapter;
     PermissionHelper mHelper;
@@ -40,6 +42,8 @@ public class ExampleActivity extends AppCompatActivity {
     private void initView() {
         mEmLvRecodeList = (ListView) findViewById(R.id.em_lv_recodeList);
         mEmTvBtn = (AudioRecordButton) findViewById(R.id.em_tv_btn);
+        mRecordBtn = (AudioRecordButton2) findViewById(R.id.voice_record_btn);
+        mRecordBtn.setOnClickListener(this);
         //设置不想要可见或者不想被点击
         // mEmTvBtn.setVisibility(View.GONE);//隐藏
        // mEmTvBtn.setCanRecord(false);//重写该方法，设置为不可点击
@@ -67,6 +71,7 @@ public class ExampleActivity extends AppCompatActivity {
 
     private void initListener() {
         mEmTvBtn.setHasRecordPromission(false);
+        mRecordBtn.setHasRecordPromission(false);
 //        授权处理
         mHelper = new PermissionHelper(this);
 
@@ -89,11 +94,27 @@ public class ExampleActivity extends AppCompatActivity {
                                 mgr.add(recordModel);
                             }
                         });
+                        mRecordBtn.setHasRecordPromission(true);
+                        mRecordBtn.setAudioFinishRecorderListener(new AudioRecordButton2.AudioFinishRecorderListener() {
+                            @Override
+                            public void onFinished(float seconds, String filePath) {
+                                Record recordModel = new Record();
+                                recordModel.setSecond((int) seconds <= 0 ? 1 : (int) seconds);
+                                recordModel.setPath(filePath);
+                                recordModel.setPlayed(false);
+                                mRecords.add(recordModel);
+                                mExampleAdapter.notifyDataSetChanged();
+
+                                //添加到数据库
+                                mgr.add(recordModel);
+                            }
+                        });
                     }
 
                     @Override
                     public void doAfterDenied(String... permission) {
                         mEmTvBtn.setHasRecordPromission(false);
+                        mRecordBtn.setHasRecordPromission(false);
                         Toast.makeText(ExampleActivity.this, "请授权,否则无法录音", Toast.LENGTH_SHORT).show();
                     }
                 }, Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE);
@@ -118,5 +139,15 @@ public class ExampleActivity extends AppCompatActivity {
 
     public void setMgr(DBManager mgr) {
         this.mgr = mgr;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.voice_record_btn:
+                // 开始录音
+                mRecordBtn.startRecord();
+                break ;
+        }
     }
 }
